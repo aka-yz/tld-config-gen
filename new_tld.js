@@ -115,17 +115,52 @@ const objectToYamlString = (obj) => {
     return yamlString;
 };
 
+const genTldSql = (tldName, network, blockNumber) => {
+    const inputFilePath = 'tld_template.sql'; // 请替换为你的SQL文件路径
+    const outputFilePath = 'new_tld.sql'; // 替换后的文件路径
+
+    const replacements = {
+        '3429398, ': `${blockNumber}, `,
+        '\\(1018, ': `(${network}, `,
+        '_ailayer_': `_${tldName.toLowerCase()}_`,
+    };
+
+    fs.readFile(inputFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading file at ${inputFilePath}:`, err);
+            return;
+        }
+
+        let result = data;
+
+        // 执行替换
+        for (const [key, value] of Object.entries(replacements)) {
+            const regex = new RegExp(key, 'g');
+            result = result.replace(regex, value);
+        }
+
+        // 将替换后的内容写入新文件
+        fs.writeFile(outputFilePath, result, 'utf8', (err) => {
+            if (err) {
+                console.error(`Error writing file at ${outputFilePath}:`, err);
+                return;
+            }
+
+            console.log(`File has been created and updated at ${outputFilePath}`);
+        });
+    });
+}
+
 // 主函数
 const main = async () => {
+    const tldName = "AILAYER"
+    const network = 18
+    const startBlockNumber = "3429398"
     for (const configFile of STG_CONFIG_FILES) {
         try {
             const config = readYamlFileAsObject(configFile);
             const input = readInputFileAsObject(INPUT_FILE_PRD);
-
-            const tldName = "AILAYER"
-            const network = 18
             const rpcuRL = "mainnet-rpc.ailayer.xyz"
-            const startBlockNumber = "3429398"
             const wtokenContract = "0x1470a4831f76954686bfb4de8180f7469ea8de6f"
             const tokenName = "BTC"
             const wtokenName = "WBTC"
@@ -203,6 +238,9 @@ const main = async () => {
             console.error('Error updating config file:', err);
         }
     }
+
+    // 生成sql
+    genTldSql(tldName, network, startBlockNumber)
 };
 
 main();
