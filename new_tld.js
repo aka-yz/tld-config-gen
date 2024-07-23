@@ -8,16 +8,14 @@ const DEV_CONFIG_FILES = [
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/dev/compents/spaceid-backend/configmap.yaml",
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/dev/spaceid-graphigo/kustomization.yaml"
 ];
-const DEV_INPUT_FILE = 'input-dev.txt';
 
 const STG_CONFIG_FILES = [
     '/Users/yz/projects/go/spaceid-infra-bootstrap/app/stg/spaceid-backend-data-processor/kustomization.yaml',
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/stg/spaceid-backend-handler/kustomization.yaml",
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/stg/spaceid-backend-onchain-consumer/kustomization.yaml",
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/stg/spaceid-backend-onchain-ingestor/kustomization.yaml",
-    "/Users/yz/projects/go/spaceid-infra-bootstrap/app/dev/spaceid-graphigo/kustomization.yaml"
+    "/Users/yz/projects/go/spaceid-infra-bootstrap/app/stg/spaceid-graphigo/kustomization.yaml"
 ];
-const PRD_INPUT_FILE = 'input-dev.txt';
 
 const PRD_CONFIG_FILES = [
     '/Users/yz/projects/go/spaceid-infra-bootstrap/app/prd/spaceid-backend-data-processor/kustomization.yaml',
@@ -119,7 +117,7 @@ const objectToYamlString = (obj) => {
 
 // 主函数
 const main = async () => {
-    for (const configFile of PRD_CONFIG_FILES) {
+    for (const configFile of STG_CONFIG_FILES) {
         try {
             const config = readYamlFileAsObject(configFile);
             const input = readInputFileAsObject(INPUT_FILE_PRD);
