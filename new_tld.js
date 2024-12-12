@@ -25,9 +25,6 @@ const PRD_CONFIG_FILES = [
     "/Users/yz/projects/go/spaceid-infra-bootstrap/app/prd/spaceid-graphigo/kustomization.yaml"
 ];
 
-const INPUT_FILE_DEV = 'input-dev.txt';
-const INPUT_FILE_PRD = 'input-prd.txt';
-
 const TARGET_DIR = '/Users/yz/projects/go/spaceid-infra-bootstrap';
 
 // 读取配置文件内容并解析为对象
@@ -153,94 +150,110 @@ const genTldSql = (tldName, network, blockNumber) => {
 
 // 主函数
 const main = async () => {
-    const tldName = "AILAYER"
-    const network = 18
-    const startBlockNumber = "3429398"
-    for (const configFile of STG_CONFIG_FILES) {
-        try {
-            const config = readYamlFileAsObject(configFile);
-            const input = readInputFileAsObject(INPUT_FILE_PRD);
-            const rpcuRL = "mainnet-rpc.ailayer.xyz"
-            const wtokenContract = "0x1470a4831f76954686bfb4de8180f7469ea8de6f"
-            const tokenName = "BTC"
-            const wtokenName = "WBTC"
-            const chainID = 2649
-            const typeDefaultVal = encoder.convertEVMChainIdToCoinType(chainID);
-            const seaportContract="0x00000000006c3852cbef3e08e8df289169ede581"
-            const seaportV14Contract="0x00000000000001ad428e4906ae43d8f9852d0dd6"
-            const seaportV15Contract="0x00000000000000adc04c56bf30ac9d3c0aaf14dc"
+    const tldName = "DUCK"
+    const network = 21
+    const startBlockNumber = "2917250"
+    // const INPUT_FILE_DEV = 'input-dev.txt';
+    let ENV_CONFIG_FILE_LIST_MAP = {
+        'input-prd.txt': [
+            ...STG_CONFIG_FILES,
+            ...PRD_CONFIG_FILES
+        ],
+        // 'input-dev.txt': [
+        //     DEV_CONFIG_FILES
+        // ],
+    }
+    for (let envFile in ENV_CONFIG_FILE_LIST_MAP){
+        if (ENV_CONFIG_FILE_LIST_MAP.hasOwnProperty(envFile)) {
+            let files = ENV_CONFIG_FILE_LIST_MAP[envFile];
+            for (const configFile of files) {
+                try {
+                    const config = readYamlFileAsObject(configFile);
+                    const input = readInputFileAsObject(envFile);
+                    const rpcuRL = "dapp-rpc-hk.duckchain.io"
+                    const wtokenContract = "0x7f9308e8d724e724ec31395f3af52e0593bb2e3f"
+                    const tokenName = "TON"
+                    const wtokenName = "WTON"
+                    const chainID = 5545
+                    const typeDefaultVal = encoder.convertEVMChainIdToCoinType(chainID);
+                    const seaportContract = "0x00000000006c3852cbef3e08e8df289169ede581"
+                    const seaportV14Contract = "0x00000000000001ad428e4906ae43d8f9852d0dd6"
+                    const seaportV15Contract = "0x00000000000000adc04c56bf30ac9d3c0aaf14dc"
 
-            // 更新配置
-            if (config.configMapGenerator && config.configMapGenerator[0].literals) {
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_CONTRACT_MAP', `${network}:${seaportContract}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_V14_CONTRACT_MAP', `${network}:${seaportV14Contract}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_V15_CONTRACT_MAP', `${network}:${seaportV15Contract}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'REGISTRY_ADDRS', `${network}:${input.registryaddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_SANN_MAP', `${network}:${input.sannaddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TOOL_KIT_CONTROLLER_MAP', `${network}:${input.controlleraddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'REVERSE_REGISTRAR_ADDRS', `${network}:${input.reverseregistraraddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_PRICE_CONTRACT_MAP', `${network}:${input.priceoracleaddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_FACTORY_MAP', `${network}:${input.tldfactoryaddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_GIFT_CARD_VOUCHER_CONTRACT_MAP', `${network}:${input.giftcardvoucheraddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_REFERRAL_HUB_CONTRACT_MAP', `${network}:${input.referralhubaddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_PREREG_CREATOR_CONTRACT_MAP', `${network}:${input.preregistrationcreatoraddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'RESOLVER_ADDRS', `${network}:${input.resolveraddr}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TOKEN_NAME_MAP', `${network}:${tokenName}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_WTOKEN_NAME_MAP', `${network}:${wtokenName}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'ENABLE_CHAIN_MAP', `${network}:true`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_ID_MAP', `${network}:${chainID}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'COIN_TYPE_DEFAULT_MAP', `${network}:${typeDefaultVal}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_DELAY_BLOCK_CNT_MAP', `${network}:0`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_CONFIRMATION_BLOCKS_NEEDED_MAP', `${network}:12`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_MAX_BLOCK_CNT_EVERY_QUERY_MAP', `${network}:200`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_BLOCK_TIME_FETCH_STEP_MAP', `${network}:20`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_DEPENDENCY_GAP_BLOCK_NUMBER_MAP', `${network}:20`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_RPC_URL_MAP', `${network}:${rpcuRL}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_BLOCK_TIME_START_BLOCK_NUMBER_MAP', `${network}:${startBlockNumber}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_WTOKEN_CONTRACT_MAP', `${network}:${wtokenContract}`);
-                appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_NAME_MAP', `${network}:${tldName}`);
-                writeObjectToYamlFile(configFile, config);
-            } else if (config.data) {
-                appendToKey(config.data, 'CHAIN_SEAPORT_CONTRACT_MAP', `${network}:${seaportContract}`);
-                appendToKey(config.data, 'CHAIN_SEAPORT_V14_CONTRACT_MAP', `${network}:${seaportV14Contract}`);
-                appendToKey(config.data, 'CHAIN_SEAPORT_V15_CONTRACT_MAP', `${network}:${seaportV15Contract}`);
-                appendToKey(config.data, 'REGISTRY_ADDRS', `${network}:${input.registryaddr}`);
-                appendToKey(config.data, 'CHAIN_TLD_SANN_MAP', `${network}:${input.sannaddr}`);
-                appendToKey(config.data, 'CHAIN_TOOL_KIT_CONTROLLER_MAP', `${network}:${input.controlleraddr}`);
-                appendToKey(config.data, 'REVERSE_REGISTRAR_ADDRS', `${network}:${input.reverseregistraraddr}`);
-                appendToKey(config.data, 'CHAIN_PRICE_CONTRACT_MAP', `${network}:${input.priceoracleaddr}`);
-                appendToKey(config.data, 'CHAIN_TLD_FACTORY_MAP', `${network}:${input.tldfactoryaddr}`);
-                appendToKey(config.data, 'CHAIN_GIFT_CARD_VOUCHER_CONTRACT_MAP', `${network}:${input.giftcardvoucheraddr}`);
-                appendToKey(config.data, 'CHAIN_TLD_REFERRAL_HUB_CONTRACT_MAP', `${network}:${input.referralhubaddr}`);
-                appendToKey(config.data, 'CHAIN_PREREG_CREATOR_CONTRACT_MAP', `${network}:${input.preregistrationcreatoraddr}`);
-                appendToKey(config.data, 'RESOLVER_ADDRS', `${network}:${input.resolveraddr}`);
-                appendToKey(config.data, 'CHAIN_TOKEN_NAME_MAP', `${network}:${tokenName}`);
-                appendToKey(config.data, 'CHAIN_WTOKEN_NAME_MAP', `${network}:${wtokenName}`);
-                appendToKey(config.data, 'ENABLE_CHAIN_MAP', `${network}:true`);
-                appendToKey(config.data, 'CHAIN_ID_MAP', `${network}:${chainID}`);
-                appendToKey(config.data, 'COIN_TYPE_DEFAULT_MAP', `${network}:${typeDefaultVal}`);
-                appendToKey(config.data, 'CHAIN_DELAY_BLOCK_CNT_MAP', `${network}:0`);
-                appendToKey(config.data, 'CHAIN_CONFIRMATION_BLOCKS_NEEDED_MAP', `${network}:12`);
-                appendToKey(config.data, 'CHAIN_MAX_BLOCK_CNT_EVERY_QUERY_MAP', `${network}:200`);
-                appendToKey(config.data, 'CHAIN_BLOCK_TIME_FETCH_STEP_MAP', `${network}:20`);
-                appendToKey(config.data, 'CHAIN_TLD_DEPENDENCY_GAP_BLOCK_NUMBER_MAP', `${network}:20`);
-                appendToKey(config.data, 'CHAIN_RPC_URL_MAP', `${network}:${rpcuRL}`);
-                appendToKey(config.data, 'CHAIN_BLOCK_TIME_START_BLOCK_NUMBER_MAP', `${network}:${startBlockNumber}`);
-                appendToKey(config.data, 'CHAIN_WTOKEN_CONTRACT_MAP', `${network}:${wtokenContract}`);
-                appendToKey(config.data, 'CHAIN_NAME_MAP', `${network}:${tldName}`);
-                writeObjectToYamlFile(configFile, objectToYamlString(config));
+                    // 更新配置
+                    if (config.configMapGenerator && config.configMapGenerator[0].literals) {
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_CONTRACT_MAP', `${network}:${seaportContract}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_V14_CONTRACT_MAP', `${network}:${seaportV14Contract}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_SEAPORT_V15_CONTRACT_MAP', `${network}:${seaportV15Contract}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'REGISTRY_ADDRS', `${network}:${input.registryaddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_SANN_MAP', `${network}:${input.sannaddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TOOL_KIT_CONTROLLER_MAP', `${network}:${input.controlleraddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'REVERSE_REGISTRAR_ADDRS', `${network}:${input.reverseregistraraddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_PRICE_CONTRACT_MAP', `${network}:${input.priceoracleaddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_FACTORY_MAP', `${network}:${input.tldfactoryaddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_GIFT_CARD_VOUCHER_CONTRACT_MAP', `${network}:${input.giftcardvoucheraddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_REFERRAL_HUB_CONTRACT_MAP', `${network}:${input.referralhubaddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_PREREG_CREATOR_CONTRACT_MAP', `${network}:${input.preregistrationcreatoraddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'RESOLVER_ADDRS', `${network}:${input.resolveraddr}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TOKEN_NAME_MAP', `${network}:${tokenName}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_WTOKEN_NAME_MAP', `${network}:${wtokenName}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'ENABLE_CHAIN_MAP', `${network}:true`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_ID_MAP', `${network}:${chainID}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'COIN_TYPE_DEFAULT_MAP', `${network}:${typeDefaultVal}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_DELAY_BLOCK_CNT_MAP', `${network}:0`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_CONFIRMATION_BLOCKS_NEEDED_MAP', `${network}:12`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_MAX_BLOCK_CNT_EVERY_QUERY_MAP', `${network}:200`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_BLOCK_TIME_FETCH_STEP_MAP', `${network}:20`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_TLD_DEPENDENCY_GAP_BLOCK_NUMBER_MAP', `${network}:20`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_RPC_URL_MAP', `${network}:${rpcuRL}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_BLOCK_TIME_START_BLOCK_NUMBER_MAP', `${network}:${startBlockNumber}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_WTOKEN_CONTRACT_MAP', `${network}:${wtokenContract}`);
+                        appendToKusKey(config.configMapGenerator[0].literals, 'CHAIN_NAME_MAP', `${network}:${tldName}`);
+                        writeObjectToYamlFile(configFile, config);
+                    } else if (config.data) {
+                        appendToKey(config.data, 'CHAIN_SEAPORT_CONTRACT_MAP', `${network}:${seaportContract}`);
+                        appendToKey(config.data, 'CHAIN_SEAPORT_V14_CONTRACT_MAP', `${network}:${seaportV14Contract}`);
+                        appendToKey(config.data, 'CHAIN_SEAPORT_V15_CONTRACT_MAP', `${network}:${seaportV15Contract}`);
+                        appendToKey(config.data, 'REGISTRY_ADDRS', `${network}:${input.registryaddr}`);
+                        appendToKey(config.data, 'CHAIN_TLD_SANN_MAP', `${network}:${input.sannaddr}`);
+                        appendToKey(config.data, 'CHAIN_TOOL_KIT_CONTROLLER_MAP', `${network}:${input.controlleraddr}`);
+                        appendToKey(config.data, 'REVERSE_REGISTRAR_ADDRS', `${network}:${input.reverseregistraraddr}`);
+                        appendToKey(config.data, 'CHAIN_PRICE_CONTRACT_MAP', `${network}:${input.priceoracleaddr}`);
+                        appendToKey(config.data, 'CHAIN_TLD_FACTORY_MAP', `${network}:${input.tldfactoryaddr}`);
+                        appendToKey(config.data, 'CHAIN_GIFT_CARD_VOUCHER_CONTRACT_MAP', `${network}:${input.giftcardvoucheraddr}`);
+                        appendToKey(config.data, 'CHAIN_TLD_REFERRAL_HUB_CONTRACT_MAP', `${network}:${input.referralhubaddr}`);
+                        appendToKey(config.data, 'CHAIN_PREREG_CREATOR_CONTRACT_MAP', `${network}:${input.preregistrationcreatoraddr}`);
+                        appendToKey(config.data, 'RESOLVER_ADDRS', `${network}:${input.resolveraddr}`);
+                        appendToKey(config.data, 'CHAIN_TOKEN_NAME_MAP', `${network}:${tokenName}`);
+                        appendToKey(config.data, 'CHAIN_WTOKEN_NAME_MAP', `${network}:${wtokenName}`);
+                        appendToKey(config.data, 'ENABLE_CHAIN_MAP', `${network}:true`);
+                        appendToKey(config.data, 'CHAIN_ID_MAP', `${network}:${chainID}`);
+                        appendToKey(config.data, 'COIN_TYPE_DEFAULT_MAP', `${network}:${typeDefaultVal}`);
+                        appendToKey(config.data, 'CHAIN_DELAY_BLOCK_CNT_MAP', `${network}:0`);
+                        appendToKey(config.data, 'CHAIN_CONFIRMATION_BLOCKS_NEEDED_MAP', `${network}:12`);
+                        appendToKey(config.data, 'CHAIN_MAX_BLOCK_CNT_EVERY_QUERY_MAP', `${network}:200`);
+                        appendToKey(config.data, 'CHAIN_BLOCK_TIME_FETCH_STEP_MAP', `${network}:20`);
+                        appendToKey(config.data, 'CHAIN_TLD_DEPENDENCY_GAP_BLOCK_NUMBER_MAP', `${network}:20`);
+                        appendToKey(config.data, 'CHAIN_RPC_URL_MAP', `${network}:${rpcuRL}`);
+                        appendToKey(config.data, 'CHAIN_BLOCK_TIME_START_BLOCK_NUMBER_MAP', `${network}:${startBlockNumber}`);
+                        appendToKey(config.data, 'CHAIN_WTOKEN_CONTRACT_MAP', `${network}:${wtokenContract}`);
+                        appendToKey(config.data, 'CHAIN_NAME_MAP', `${network}:${tldName}`);
+                        writeObjectToYamlFile(configFile, objectToYamlString(config));
+                    }
+
+                    // await gitCommitAndPush(`Update kustomization.yaml for ${tldName}`);
+
+                    console.log('Config file updated.');
+                } catch (err) {
+                    console.error('Error updating config file:', err);
+                }
             }
-
-            // await gitCommitAndPush(`Update kustomization.yaml for ${tldName}`);
-
-            console.log('Config file updated.');
-        } catch (err) {
-            console.error('Error updating config file:', err);
         }
+
     }
 
     // 生成sql
-    genTldSql(tldName, network, startBlockNumber)
+    // genTldSql(tldName, network, startBlockNumber)
 };
 
 main();
